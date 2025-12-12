@@ -31,10 +31,10 @@ export default function (api) {
         "transform-define",
         {
           "process.env.EXPO_NOTIFICATIONS_DISABLED": JSON.stringify(
-            process.env.EXPO_NOTIFICATIONS_DISABLED || "false",
+            process.env.EXPO_NOTIFICATIONS_DISABLED ||env.EXPO_NOTIFICATIONS_DISABLED || "false",
           ),
           "process.env.EXPO_DEV_CLIENT": JSON.stringify(
-            process.env.EXPO_DEV_CLIENT || "true",
+            process.env.EXPO_DEV_CLIENT || env.EXPO_DEV_CLIENT || "true",
           ),
           "process.env.DISCORD_CLIENT_SECRET": JSON.stringify(
             process.env.DISCORD_CLIENT_SECRET || env.DISCORD_CLIENT_SECRET,
@@ -46,7 +46,7 @@ export default function (api) {
           "process.env.DISCORD_REDIRECT_URI": JSON.stringify(
             process.env.DISCORD_REDIRECT_URI ||
               env.DISCORD_REDIRECT_URI ||
-              "https://involvex.myfritz.link:8082/callback",
+              "http://involvex.myfritz.link:8081/callback",
           ),
         },
       ],

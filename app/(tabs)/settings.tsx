@@ -3,8 +3,13 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import {
+  getNotificationStatus,
+  getNotificationStatusMessage,
+} from "@/services/notificationService";
+import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Button } from "react-native";
 import { styles } from "../../css/styles";
 import accountService, {
@@ -12,10 +17,6 @@ import accountService, {
 } from "../../services/accountService";
 import LoginScreen from "../login";
 import PermissionsScreen from "../permissions";
-import {
-  getNotificationStatus,
-  getNotificationStatusMessage,
-} from "@/services/notificationService";
 
 // Helper function to get environment variable safely
 function getEnvVar(key: string): string | undefined {
@@ -57,22 +58,25 @@ export default function SettingsScreen() {
     }
   };
 
-  useEffect(() => {
-    loadUserData();
+  // Use useFocusEffect to refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUserData();
 
-    // Check notification status
-    const checkNotificationStatus = async () => {
-      try {
-        const status = await getNotificationStatus();
-        setNotificationStatus(getNotificationStatusMessage(status));
-      } catch (error) {
-        console.error("Error checking notification status:", error);
-        setNotificationStatus("Error checking status");
-      }
-    };
+      // Check notification status
+      const checkNotificationStatus = async () => {
+        try {
+          const status = await getNotificationStatus();
+          setNotificationStatus(getNotificationStatusMessage(status));
+        } catch (error) {
+          console.error("Error checking notification status:", error);
+          setNotificationStatus("Error checking status");
+        }
+      };
 
-    checkNotificationStatus();
-  }, []);
+      checkNotificationStatus();
+    }, [])
+  );
 
   const discordClientId = getEnvVar("DISCORD_CLIENT_ID");
   const hasDiscordConfig = Boolean(discordClientId);

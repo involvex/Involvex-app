@@ -25,13 +25,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.involvex.involvex",
-      "scheme": "involvex"
+      "package": "com.involvex.involvex"
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png",
-      "startUrl": "http://192.168.178.69:8081"
+      "startUrl": "https://involvex.myfritz.link:8082/"
     },
     "plugins": [
       "expo-router",
@@ -55,7 +54,7 @@
           "launchWithDevTools": true,
           "debuggerHost": "192.168.178.69:8081",
           "debuggerPort": 9222,
-          "host": "192.168.178.69:8081"
+          "host": "https://involvex.myfritz.link:8082"
         }
       ],
       [
@@ -65,7 +64,7 @@
           "devClient": true,
           "debuggerHost": "192.168.178.69:8081",
           "debuggerPort": 9222,
-          "host": "192.168.178.69:8081"
+          "host": "https://involvex.myfritz.link:8082"
         }
       ],
 
@@ -85,10 +84,9 @@
     },
     "extra": {
       "router": {
-        "origin": "http://192.168.178.69:8081",
-        "scheme": "involvex",
-        "hostname": "192.168.178.69",
-        "port": 8081,
+        "origin": "https://involvex.myfritz.link",
+        "hostname": "involvex.myfritz.link",
+        "port": 8082,
         "http": true,
         "devClient": true
       },

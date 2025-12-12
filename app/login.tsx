@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { login } from "@/css/styles";
 import { accountService } from "@/services/accountService";
-import * as AuthSession from "expo-auth-session";
+import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
 import { Alert, Button, Text, View } from "react-native";
@@ -16,10 +16,12 @@ const DISCORD_CLIENT_ID =
 const DISCORD_CLIENT_SECRET =
   process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET;
 
+// Use HTTP/HTTPS redirect URI that Discord can handle
 const DISCORD_REDIRECT_URI =
   process.env.DISCORD_REDIRECT_URI ||
-  "http://involvex.myfritz.link:8081/callback";
-const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_REDIRECT_URI}&response_type=token&scope=identify%20email`;
+  "https://involvex.myfritz.link:8081/callback";
+
+const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=token&scope=identify%20email`;
 
 interface DiscordUser {
   id: string;
@@ -29,91 +31,93 @@ interface DiscordUser {
 }
 
 export default function LoginScreen() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const loginWithDiscord = async () => {
     try {
       setIsLoading(true);
 
-      // Create the OAuth request with manual discovery
-      const discovery = {
-        authorizationEndpoint: "https://discord.com/api/oauth2/authorize",
-        tokenEndpoint: "https://discord.com/api/oauth2/token",
-        Proxy: "https://auth.expo.dev/@involvex/involvex",
-        userInfoEndpoint: "https://discord.com/api/users/@me",
-      };
+      console.log("Starting Discord OAuth flow...");
+      console.log("Auth URL:", DISCORD_AUTH_URL);
+      console.log("Redirect URI:", DISCORD_REDIRECT_URI);
 
-      // Create the OAuth request
-      const request = new AuthSession.AuthRequest({
-        clientId: DISCORD_CLIENT_ID,
-        clientSecret: DISCORD_CLIENT_SECRET,
-        scopes: ["identify", "email"],
-        redirectUri: DISCORD_REDIRECT_URI,
-        responseType: AuthSession.ResponseType.Token,
-      });
-      console.log("Starting Discord OAuth flow:", request);
+      // Open Discord OAuth in browser
+      const result = await WebBrowser.openAuthSessionAsync(
+        DISCORD_AUTH_URL,
+        DISCORD_REDIRECT_URI
+      );
 
-      // Make the request
-      const result = await request.promptAsync(discovery);
+      console.log("WebBrowser result:", result);
 
-      if (result.type === "success") {
-        try {
-          // Extract the access token from the URL hash
-          const accessToken = result.params.access_token;
+      if (result.type === "success" && result.url) {
+        console.log("OAuth successful, processing callback...");
+        
+        // Extract access token from URL
+        const url = new URL(result.url);
+        const accessToken = url.hash.match(/access_token=([^&]*)/)?.[1];
 
-          if (!accessToken) {
-            throw new Error("No access token received from Discord");
-          }
-
-          // Fetch user information from Discord API
-          const response = await fetch("https://discord.com/api/users/@me", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              "User-Agent": "Chrome/91.0 Desktop",
-            },
-          });
-
-          if (!response.ok) {
-            console.error(
-              "Discord API error:",
-              response.status,
-              await response.text(),
-            );
-            throw new Error(`Discord API error: ${response.status}`);
-          }
-
-          const discordUserData = await response.json();
-
-          const discordUser: DiscordUser = {
-            id: discordUserData.id,
-            username: discordUserData.username,
-            email: discordUserData.email,
-            avatar: discordUserData.avatar
-              ? `https://cdn.discordapp.com/avatars/${discordUserData.id}/${discordUserData.avatar}.png`
-              : undefined,
-          };
-
-          // Login to our app
-          await accountService.loginWithDiscord(discordUser);
-          console.log("Logged in with Discord:", discordUser);
-
-          Alert.alert(
-            "Success!",
-            `Welcome, ${discordUser.username}! You've been logged in with Discord.`,
-            [{ text: "OK" }],
-          );
-        } catch (error) {
-          console.error("Discord login error:", error);
-          Alert.alert(
-            "Login Error",
-            "Failed to login with Discord. Please check your internet connection and try again.",
-          );
+        if (!accessToken) {
+          throw new Error("No access token found in callback URL");
         }
+
+        console.log("Access token found, fetching user data...");
+
+        // Fetch user information from Discord API
+        const response = await fetch("https://discord.com/api/users/@me", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "User-Agent": "InvolveX/1.0.0",
+          },
+        });
+
+        if (!response.ok) {
+          console.error(
+            "Discord API error:",
+            response.status,
+            await response.text(),
+          );
+          throw new Error(`Discord API error: ${response.status}`);
+        }
+
+        const discordUserData = await response.json();
+
+        const discordUser: DiscordUser = {
+          id: discordUserData.id,
+          username: discordUserData.username,
+          email: discordUserData.email,
+          avatar: discordUserData.avatar
+            ? `https://cdn.discordapp.com/avatars/${discordUserData.id}/${discordUserData.avatar}.png`
+            : undefined,
+        };
+
+        // Login to our app
+        await accountService.loginWithDiscord(discordUser);
+        console.log("Successfully logged in with Discord:", discordUser);
+
+        Alert.alert(
+          "Success!",
+          `Welcome, ${discordUser.username}! You've been logged in with Discord.`,
+          [
+            {
+              text: "Continue",
+              onPress: () => {
+                router.replace("/(tabs)/settings");
+              },
+            },
+          ],
+        );
       } else {
         // User cancelled or there was an error
         console.log("OAuth cancelled or failed:", result.type);
+        if (result.type === "cancel") {
+          Alert.alert(
+            "Login Cancelled",
+            "Discord login was cancelled. Please try again.",
+          );
+        }
       }
     } catch (error) {
       console.error("Discord login error:", error);
