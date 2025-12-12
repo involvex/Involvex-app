@@ -44,3 +44,8 @@ app-example
 /android
 
 .idea
+install-key.pem
+install.pem
+.local-ssl-proxy
+
+firebase-debug.log

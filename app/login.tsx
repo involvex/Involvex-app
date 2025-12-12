@@ -3,7 +3,6 @@ import { ThemedView } from "@/components/themed-view";
 import { login } from "@/css/styles";
 import { accountService } from "@/services/accountService";
 import * as AuthSession from "expo-auth-session";
-import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
 import { Alert, Button, Text, View } from "react-native";
@@ -13,11 +12,11 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Discord OAuth configuration
 const DISCORD_CLIENT_ID =
-  process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || "1438575785228242994";
-const DISCORD_REDIRECT_URI = AuthSession.makeRedirectUri({
-  path: "settings",
-  scheme: "involvex",
-});
+  process.env.DISCORD_CLIENT_ID || "1438575785228242994";
+const DISCORD_CLIENT_SECRET =
+  process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET;
+
+const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || "http://involvex.myfritz.link:8081/callback";
 const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_REDIRECT_URI}&response_type=token&scope=identify%20email`;
 
 interface DiscordUser {
@@ -38,15 +37,19 @@ export default function LoginScreen() {
       const discovery = {
         authorizationEndpoint: "https://discord.com/api/oauth2/authorize",
         tokenEndpoint: "https://discord.com/api/oauth2/token",
+        Proxy: "https://auth.expo.dev/@involvex/involvex",
+        userInfoEndpoint: "https://discord.com/api/users/@me",
       };
 
       // Create the OAuth request
       const request = new AuthSession.AuthRequest({
         clientId: DISCORD_CLIENT_ID,
+        clientSecret: DISCORD_CLIENT_SECRET,
         scopes: ["identify", "email"],
-        redirectUri: DISCORD_AUTH_URL,
+        redirectUri: DISCORD_REDIRECT_URI,
         responseType: AuthSession.ResponseType.Token,
       });
+      console.log("Starting Discord OAuth flow:", request);
 
       // Make the request
       const result = await request.promptAsync(discovery);
@@ -64,10 +67,14 @@ export default function LoginScreen() {
           const response = await fetch("https://discord.com/api/users/@me", {
             headers: {
               Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "User-Agent": "Chrome/91.0 Desktop",
             },
           });
 
           if (!response.ok) {
+            console.error("Discord API error:", response.status, await response.text());
             throw new Error(`Discord API error: ${response.status}`);
           }
 
@@ -84,6 +91,7 @@ export default function LoginScreen() {
 
           // Login to our app
           await accountService.loginWithDiscord(discordUser);
+          console.log("Logged in with Discord:", discordUser);
 
           Alert.alert(
             "Success!",

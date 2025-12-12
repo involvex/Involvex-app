@@ -1,3 +1,5 @@
+import env from "react-native-dotenv";
+
 export default function (api) {
   api.cache(true);
   return {
@@ -12,6 +14,15 @@ export default function (api) {
           },
         },
       ],
+      ["module:react-native-dotenv", {
+        "path": ".env",
+        "moduleName": "@env",
+        env: env,
+        envName: "APP_ENV",
+        "safe": false,
+        "allowUndefined": true,
+        "verbose": true
+      }],
       // Plugin to handle conditional imports for expo-notifications
       [
         "transform-define",
@@ -22,9 +33,19 @@ export default function (api) {
           "process.env.EXPO_DEV_CLIENT": JSON.stringify(
             process.env.EXPO_DEV_CLIENT || "true",
           ),
+          "process.env.DISCORD_CLIENT_SECRET": JSON.stringify(
+            process.env.DISCORD_CLIENT_SECRET || env.DISCORD_CLIENT_SECRET,
+          ),
+          "process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID": JSON.stringify(
+            process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || env.EXPO_PUBLIC_DISCORD_CLIENT_ID,
+          ),
+          "process.env.DISCORD_REDIRECT_URI": JSON.stringify(
+            process.env.DISCORD_REDIRECT_URI || env.DISCORD_REDIRECT_URI || "https://involvex.myfritz.link:8082/callback",
+          ),
         },
       ],
       // Suppress expo-notifications warnings in development
+      
     ],
   };
 }

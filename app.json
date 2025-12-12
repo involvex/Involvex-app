@@ -47,6 +47,25 @@
           }
         }
       ],
+      ["expo-dev-client",
+        {
+          "http": true,
+          "webSocket": true,
+          "launchWithDevTools": true,
+          "debuggerHost": "192.168.178.69:8081",
+          "debuggerPort": 9222,
+          "host": "192.168.178.69:8081"
+        }
+      ],
+      ["expo-dev-menu",
+        {
+          "launchWithDevTools": true,
+          "devClient": true,
+          "debuggerHost": "192.168.178.69:8081",
+          "debuggerPort": 9222,
+          "host": "192.168.178.69:8081"
+        }
+      ],
 
       [
         "expo-notifications",
@@ -63,7 +82,14 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
+      "router": {
+        "origin": "http://192.168.178.69:8081",
+        "scheme": "involvex",
+        "hostname": "192.168.178.69",
+        "port": 8081,
+        "http": true,
+        "devClient": true
+      },
       "eas": {
         "projectId": "c1ba12c1-38c1-4f48-ba5c-8c9b0c1287cd"
       }
