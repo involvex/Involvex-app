@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "involvex",
     "userInterfaceStyle": "automatic",
-    "jsEngine": "hermes",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true

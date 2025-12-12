@@ -1,69 +1,60 @@
-import { Image } from "expo-image";
-import { StyleSheet } from "react-native";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { ExternalLink } from "@/components/external-link"
+import ParallaxScrollView from "@/components/parallax-scroll-view"
+import { ThemedText } from "@/components/themed-text"
+import { ThemedView } from "@/components/themed-view"
+import { IconSymbol } from "@/components/ui/icon-symbol"
+import { Image } from "expo-image"
+// import { StyleSheet } from "react-native"
+import { styles } from "../../css/styles"
 
 export default function SettingsScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/logo.png")}
-          style={{ width: "100%", height: "100%" }}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Settings</ThemedText>
-      </ThemedView>
-      <ThemedText>
-        This is the settings screen. You can customize your preferences here.
-      </ThemedText>
-      <ThemedText>More options will be added soon!</ThemedText>
+	return (
+		<ParallaxScrollView
+			headerBackgroundColor={{ light: "#000000ff", dark: "#000000ff" }}
+			headerImage={
+				<Image
+					source={require("@/assets/images/logo.png")}
+					// style={styles.reactLogo}
+					style={styles.logo}
+				/>
+			}>
+			<ThemedView style={styles.titleContainer}>
+				<ThemedText type="title">Settings</ThemedText>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">General Settings</ThemedText>
-      </ThemedView>
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">General Settings</ThemedText>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Account Settings</ThemedText>
-      </ThemedView>
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">Account Settings</ThemedText>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Privacy Settings</ThemedText>
-      </ThemedView>
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">Privacy Settings</ThemedText>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Notifications</ThemedText>
-      </ThemedView>
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">Notifications</ThemedText>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">About</ThemedText>
-      </ThemedView>
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">About</ThemedText>
+				<ExternalLink href="https://involvex.github.io/Involvex/">
+					<IconSymbol name="info" color={"green"} /> Github Portfolio
+				</ExternalLink>
+			</ThemedView>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Help & Support</ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+			<ThemedView style={styles.stepContainer}>
+				<ThemedText type="subtitle">Help & Support</ThemedText>
+				<ExternalLink href="https://involvex.github.io/Involvex/">
+					<IconSymbol
+						name="questionmark.circle.fill"
+						color={"green"}
+					/>{" "}
+					Contact Support
+				</ExternalLink>
+			</ThemedView>
+		</ParallaxScrollView>
+	)
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-});

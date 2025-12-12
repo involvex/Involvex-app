@@ -45,6 +45,10 @@ const MAPPING = {
   "doc.on.clipboard": "content-copy",
   "doc.on.clipboard.fill": "content-copy",
   "doc.on.doc": "content-copy",
+  "info": "info",
+  "info.circle": "info",
+  "terminal.fill": "terminal",
+  "sparkles.tv.fill": "auto-awesome",
 } as IconMapping;
 
 /**
