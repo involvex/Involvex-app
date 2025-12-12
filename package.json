@@ -20,8 +20,7 @@
     "biome:check": "biome check .",
     "biome:format": "biome format .",
     "biome:lint": "biome lint .",
-    "biome:fix": "biome check --write --apply-unsafe .",
-    "biome": "npm run biome:check && npm run biome:format && npm run biome:lint && npm run biome:fix"
+    "biome:fix": "biome check --write --apply-unsafe ."
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

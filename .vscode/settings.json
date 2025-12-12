@@ -3,5 +3,13 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/.dart_tool": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true
   }
 }
