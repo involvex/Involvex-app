@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "involvex",
+    "githubUrl": "https://github.com/involvex/involvex-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -24,11 +25,13 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.involvex.involvex"
+      "package": "com.involvex.involvex",
+      "scheme": "involvex"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "startUrl": "http://192.168.178.69:8081"
     },
     "plugins": [
       "expo-router",
@@ -44,6 +47,7 @@
           }
         }
       ],
+
       [
         "expo-notifications",
         {

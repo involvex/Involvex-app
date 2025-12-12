@@ -3,6 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { login } from "@/css/styles";
 import { accountService } from "@/services/accountService";
 import * as AuthSession from "expo-auth-session";
+import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
 import { Alert, Button, Text, View } from "react-native";
@@ -14,10 +15,10 @@ WebBrowser.maybeCompleteAuthSession();
 const DISCORD_CLIENT_ID =
   process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || "1438575785228242994";
 const DISCORD_REDIRECT_URI = AuthSession.makeRedirectUri({
+  path: "settings",
   scheme: "involvex",
 });
-
-const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_REDIRECT_URI}&response_type=token&scope=identify%20email`;
 
 interface DiscordUser {
   id: string;
@@ -43,7 +44,7 @@ export default function LoginScreen() {
       const request = new AuthSession.AuthRequest({
         clientId: DISCORD_CLIENT_ID,
         scopes: ["identify", "email"],
-        redirectUri: DISCORD_REDIRECT_URI,
+        redirectUri: DISCORD_AUTH_URL,
         responseType: AuthSession.ResponseType.Token,
       });
 

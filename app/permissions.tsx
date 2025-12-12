@@ -22,8 +22,7 @@ async function getPermissionsStatus(): Promise<PermissionStatus> {
 
     // Dynamic import to avoid web issues
     const Notifications = await import("expo-notifications");
-    const { status: notificationStatus } =
-      await Notifications.getPermissionsAsync();
+    const { status: notificationStatus } = await Notifications.getPermissionsAsync();
 
     return {
       notifications: notificationStatus === "granted" ? "granted" : "denied",
