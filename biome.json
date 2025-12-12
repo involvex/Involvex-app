@@ -28,10 +28,10 @@
       "trailingCommas": "all",
       "semicolons": "asNeeded",
       "lineEnding": "auto",
-	  "expand":"auto"
+      "expand": "auto"
     },
     "linter": {
-      "enabled":true
+      "enabled": true
     }
   },
   "assist": {
@@ -41,7 +41,7 @@
         "organizeImports": "on",
         "recommended": true
       },
-	  "recommended": true
+      "recommended": true
     }
   }
 }

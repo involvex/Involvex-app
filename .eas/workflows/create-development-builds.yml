@@ -1,4 +1,3 @@
-
 # Create development builds
 #
 # This workflow shows how to create development builds.
@@ -26,4 +25,3 @@ jobs:
     params:
       profile: development
       platform: android
-
