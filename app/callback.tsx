@@ -7,7 +7,6 @@ export default function callbackScreen() {
   const params = useLocalSearchParams();
   const { code } = params;
 
-  
   function navigatehome() {
     router.navigate("/(tabs)");
   }
@@ -19,11 +18,28 @@ export default function callbackScreen() {
     }
   }, [code]);
   return (
-    <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <ActivityIndicator size="large" color="#6dff29ff" style={{ marginBottom: 20, marginTop: 20, width: 100, height: 100, transform: [{ rotate: '45deg' }], }} />
-    <br />
-    <Link href="/" style={{color: '#6dff29ff', textDecorationLine: 'underline'}} onPress={navigatehome}>Home</Link>
+    <ThemedView
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    >
+      <ActivityIndicator
+        size="large"
+        color="#6dff29ff"
+        style={{
+          marginBottom: 20,
+          marginTop: 20,
+          width: 100,
+          height: 100,
+          transform: [{ rotate: "45deg" }],
+        }}
+      />
+      <br />
+      <Link
+        href="/"
+        style={{ color: "#6dff29ff", textDecorationLine: "underline" }}
+        onPress={navigatehome}
+      >
+        Home
+      </Link>
     </ThemedView>
-  )
-
-};
+  );
+}

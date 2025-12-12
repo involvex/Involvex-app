@@ -47,7 +47,8 @@
           }
         }
       ],
-      ["expo-dev-client",
+      [
+        "expo-dev-client",
         {
           "http": true,
           "webSocket": true,
@@ -57,7 +58,8 @@
           "host": "192.168.178.69:8081"
         }
       ],
-      ["expo-dev-menu",
+      [
+        "expo-dev-menu",
         {
           "launchWithDevTools": true,
           "devClient": true,

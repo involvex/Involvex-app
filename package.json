@@ -30,7 +30,7 @@
     "build:dev:simulator": "eas build --platform all --profile development-simulator",
     "install:dev": "npm run build:dev && echo 'Install the development build on your device'",
     "dev:client": "npx expo start --dev-client",
-    "local-ssl-proxy": " local-ssl-proxy --source 8082 --target 8081 -n \"involvex.myfritz.link\" --key install-key.pem --cert install.pem"
+    "localsslproxy": " local-ssl-proxy --source 8082 --target 8081 -n \"involvex.myfritz.link\" --key install-key.pem --cert install.pem"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -84,7 +84,6 @@
     "eslint": "^9.25.0",
     "eslint-config-biome": "^2.1.3",
     "eslint-config-expo": "~10.0.0",
-    "expo-dev-menu": "^7.0.18",
     "local-ssl-proxy": "^2.0.5",
     "path": "^0.12.7",
     "prettier": "^3.7.4",

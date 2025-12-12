@@ -16,7 +16,9 @@ const DISCORD_CLIENT_ID =
 const DISCORD_CLIENT_SECRET =
   process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_CLIENT_SECRET;
 
-const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || "http://involvex.myfritz.link:8081/callback";
+const DISCORD_REDIRECT_URI =
+  process.env.DISCORD_REDIRECT_URI ||
+  "http://involvex.myfritz.link:8081/callback";
 const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${DISCORD_REDIRECT_URI}&response_type=token&scope=identify%20email`;
 
 interface DiscordUser {
@@ -74,7 +76,11 @@ export default function LoginScreen() {
           });
 
           if (!response.ok) {
-            console.error("Discord API error:", response.status, await response.text());
+            console.error(
+              "Discord API error:",
+              response.status,
+              await response.text(),
+            );
             throw new Error(`Discord API error: ${response.status}`);
           }
 
