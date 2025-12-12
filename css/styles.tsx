@@ -70,7 +70,6 @@ export const login = StyleSheet.create({
     alignSelf: "auto",
     width: 20,
     marginLeft: 0,
-    
   },
   pressed: {
     backgroundColor: "rgba(0,122,255,0.1)",
@@ -82,5 +81,4 @@ export const login = StyleSheet.create({
     backgroundColor: "#007AFF",
     transform: [{ scale: 1 }],
   },
-
 });

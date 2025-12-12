@@ -6,7 +6,11 @@ import { Collapsible } from "@/components/ui/collapsible";
 import { Fonts } from "@/constants/theme";
 import { Image } from "expo-image";
 import { useEffect, useRef, useState } from "react";
+import { Alert, Button, View } from "react-native";
 import { styles } from "../../css/styles";
+import accountService, {
+  type SubscribedRepo,
+} from "../../services/accountService";
 
 // Fetch repository data
 const fetchInvolvexRepos = async () => {
@@ -43,15 +47,27 @@ const fetchInvolvexRepos = async () => {
 // Repository item component
 interface RepoItemProps {
   repo: {
+    id: string;
     name: string;
+    fullName: string;
     stargazers_count: number;
     forks_count: number;
     html_url: string;
     description?: string;
+    owner: {
+      login: string;
+      avatar_url: string;
+    };
   };
+  isSubscribed: boolean;
+  onToggleSubscription: (repo: any) => void;
 }
 
-const RepoItem = ({ repo }: RepoItemProps) => {
+const RepoItem = ({
+  repo,
+  isSubscribed,
+  onToggleSubscription,
+}: RepoItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -59,29 +75,103 @@ const RepoItem = ({ repo }: RepoItemProps) => {
       style={{
         marginVertical: 8,
         padding: 12,
-        borderRadius: 8,
-        backgroundColor: "rgba(0,0,0,0.05)",
+        borderRadius: 12,
+        backgroundColor: isSubscribed
+          ? "rgba(255,107,107,0.1)"
+          : "rgba(0,0,0,0.05)",
         borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.1)",
+        borderColor: isSubscribed ? "#FF6B6B" : "rgba(0,0,0,0.1)",
       }}
     >
-      <ThemedText
-        type="defaultSemiBold"
-        style={{ fontSize: 16, marginBottom: 4 }}
-        onPress={() => setIsExpanded(!isExpanded)}
+      <ThemedView
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
-        📁 {repo.name} ⭐ {repo.stargazers_count} 🍴 {repo.forks_count}
-      </ThemedText>
+        <ThemedView style={{ flex: 1 }}>
+          <ThemedText
+            type="defaultSemiBold"
+            style={{ fontSize: 16, marginBottom: 4 }}
+            onPress={() => setIsExpanded(!isExpanded)}
+          >
+            📁 {repo.name}
+          </ThemedText>
+
+          <ThemedView
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 16,
+              marginBottom: 8,
+            }}
+          >
+            <ThemedText style={{ fontSize: 12, color: "#666" }}>
+              ⭐ {repo.stargazers_count.toLocaleString()}
+            </ThemedText>
+            <ThemedText style={{ fontSize: 12, color: "#666" }}>
+              🍴 {repo.forks_count.toLocaleString()}
+            </ThemedText>
+            <ThemedText style={{ fontSize: 12, color: "#666" }}>
+              👤 {repo.owner.login}
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
+
+        <Button
+          title={isSubscribed ? "❤️ Subscribed" : "🤍 Subscribe"}
+          onPress={() => onToggleSubscription(repo)}
+          color={isSubscribed ? "#FF6B6B" : "#007AFF"}
+        />
+      </ThemedView>
 
       {isExpanded && (
-        <ThemedView style={{ marginTop: 8, paddingLeft: 12 }}>
+        <ThemedView
+          style={{
+            marginTop: 12,
+            paddingLeft: 12,
+            borderLeftWidth: 2,
+            borderLeftColor: "rgba(0,0,0,0.1)",
+          }}
+        >
           {repo.description && (
-            <ThemedText style={{ marginBottom: 8, fontStyle: "italic" }}>
+            <ThemedText
+              style={{
+                marginBottom: 12,
+                fontStyle: "italic",
+                lineHeight: 20,
+              }}
+            >
               {repo.description}
             </ThemedText>
           )}
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <Image
+              source={{ uri: repo.owner.avatar_url }}
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+              }}
+              contentFit="cover"
+              transition={1000}
+            />
+            <ThemedText style={{ fontSize: 12, color: "#666" }}>
+              by {repo.owner.login}
+            </ThemedText>
+          </View>
+
           <ExternalLink href={repo.html_url as any}>
-            <ThemedText type="link" style={{ color: "#007AFF" }}>
+            <ThemedText type="link" style={{ color: "#007AFF", fontSize: 14 }}>
               View on GitHub →
             </ThemedText>
           </ExternalLink>
@@ -97,6 +187,12 @@ const RepoList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [sortBy, setSortBy] = useState<"stars" | "forks" | "name" | "updated">(
+    "stars",
+  );
+  const [subscribedRepos, setSubscribedRepos] = useState<Set<string>>(
+    new Set(),
+  );
   const cacheRef = useRef<any[] | null>(null);
   const maxRetries = 3;
 
@@ -125,6 +221,16 @@ const RepoList = () => {
     }
   };
 
+  const loadSubscribedRepos = async () => {
+    try {
+      const subscribed = await accountService.getSubscribedRepos();
+      const repoIds = new Set(subscribed.map(repo => repo.id));
+      setSubscribedRepos(repoIds);
+    } catch (error) {
+      console.error("Error loading subscribed repos:", error);
+    }
+  };
+
   const handleRetry = async () => {
     if (retryCount < maxRetries) {
       setRetryCount(prev => prev + 1);
@@ -134,8 +240,72 @@ const RepoList = () => {
     }
   };
 
+  const sortRepos = (repos: any[]) => {
+    const sortedRepos = [...repos];
+    switch (sortBy) {
+      case "stars":
+        return sortedRepos.sort(
+          (a, b) => b.stargazers_count - a.stargazers_count,
+        );
+      case "forks":
+        return sortedRepos.sort((a, b) => b.forks_count - a.forks_count);
+      case "name":
+        return sortedRepos.sort((a, b) => a.name.localeCompare(b.name));
+      case "updated":
+        return sortedRepos.sort(
+          (a, b) =>
+            new Date(b.updated_at || 0).getTime() -
+            new Date(a.updated_at || 0).getTime(),
+        );
+      default:
+        return sortedRepos;
+    }
+  };
+
+  const handleToggleSubscription = async (repo: any) => {
+    try {
+      const repoId = repo.id.toString();
+      const isCurrentlySubscribed = subscribedRepos.has(repoId);
+
+      if (isCurrentlySubscribed) {
+        // Unsubscribe
+        await accountService.unsubscribeFromRepo(repoId);
+        setSubscribedRepos(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(repoId);
+          return newSet;
+        });
+        Alert.alert("Unsubscribed", `You have unsubscribed from ${repo.name}`);
+      } else {
+        // Subscribe
+        const subscribedRepo: Omit<
+          SubscribedRepo,
+          "subscribedAt" | "lastUpdated"
+        > = {
+          id: repoId,
+          name: repo.name,
+          fullName: repo.full_name || `${repo.owner.login}/${repo.name}`,
+          description: repo.description,
+          owner: repo.owner,
+          html_url: repo.html_url,
+          stargazers_count: repo.stargazers_count,
+          forks_count: repo.forks_count,
+          language: repo.language,
+        };
+
+        await accountService.subscribeToRepo(subscribedRepo);
+        setSubscribedRepos(prev => new Set([...prev, repoId]));
+        Alert.alert("Subscribed!", `You are now following ${repo.name}`);
+      }
+    } catch (error) {
+      console.error("Error toggling subscription:", error);
+      Alert.alert("Error", "Failed to update subscription. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchRepos();
+    loadSubscribedRepos();
   }, []);
 
   if (loading) {
@@ -193,8 +363,37 @@ const RepoList = () => {
 
   return (
     <ThemedView>
-      {repos.map((repo, index) => (
-        <RepoItem key={repo.id || index} repo={repo} />
+      {/* Sort Options */}
+      <ThemedView
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          backgroundColor: "rgba(0,0,0,0.02)",
+          borderRadius: 8,
+        }}
+      >
+        <ThemedText type="defaultSemiBold" style={{ marginBottom: 8 }}>
+          Sort by:
+        </ThemedText>
+        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+          {(["stars", "forks", "name", "updated"] as const).map(sortOption => (
+            <Button
+              key={sortOption}
+              title={sortOption.charAt(0).toUpperCase() + sortOption.slice(1)}
+              onPress={() => setSortBy(sortOption)}
+              color={sortBy === sortOption ? "#007AFF" : "#ccc"}
+            />
+          ))}
+        </View>
+      </ThemedView>
+
+      {sortRepos(repos).map((repo, index) => (
+        <RepoItem
+          key={repo.id || index}
+          repo={repo}
+          isSubscribed={subscribedRepos.has(repo.id.toString())}
+          onToggleSubscription={handleToggleSubscription}
+        />
       ))}
     </ThemedView>
   );
