@@ -24,6 +24,9 @@ export default function CallbackScreen() {
 
   const handleCallback = async () => {
     try {
+      console.log("Callback screen - processing OAuth response...");
+      console.log("URL params:", params);
+
       // Extract access token from URL parameters or hash
       let accessToken = "";
 
@@ -31,11 +34,20 @@ export default function CallbackScreen() {
       if (typeof window !== "undefined" && window.location.hash) {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         accessToken = hashParams.get("access_token") || "";
+        console.log("Found access token in hash:", !!accessToken);
       }
 
       // Check for token in query params (fallback)
       if (!accessToken && params.access_token) {
         accessToken = params.access_token as string;
+        console.log("Found access token in params:", !!accessToken);
+      }
+
+      // Check for token in URL search params
+      if (!accessToken && typeof window !== "undefined" && window.location.search) {
+        const searchParams = new URLSearchParams(window.location.search);
+        accessToken = searchParams.get("access_token") || "";
+        console.log("Found access token in search:", !!accessToken);
       }
 
       console.log("OAuth Callback - Access token found:", !!accessToken);

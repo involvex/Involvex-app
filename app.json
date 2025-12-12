@@ -30,7 +30,7 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png",
-      "startUrl": "https://involvex.myfritz.link:8082/"
+      "startUrl": "https://involvex.expo.app/"
     },
     "plugins": [
       "expo-router",
@@ -54,7 +54,7 @@
           "launchWithDevTools": true,
           "debuggerHost": "192.168.178.69:8081",
           "debuggerPort": 9222,
-          "host": "https://involvex.myfritz.link:8082"
+          "host": "https://involvex.expo.app"
         }
       ],
       [
@@ -64,7 +64,7 @@
           "devClient": true,
           "debuggerHost": "192.168.178.69:8081",
           "debuggerPort": 9222,
-          "host": "https://involvex.myfritz.link:8082"
+          "host": "https://involvex.expo.app"
         }
       ],
 
@@ -84,9 +84,9 @@
     },
     "extra": {
       "router": {
-        "origin": "https://involvex.myfritz.link",
-        "hostname": "involvex.myfritz.link",
-        "port": 8082,
+        "origin": "https://involvex.expo.app",
+        "hostname": "involvex.expo.app",
+        "port": 80,
         "http": true,
         "devClient": true
       },

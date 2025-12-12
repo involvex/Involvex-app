@@ -46,7 +46,7 @@ export default function (api) {
           "process.env.DISCORD_REDIRECT_URI": JSON.stringify(
             process.env.DISCORD_REDIRECT_URI ||
               env.DISCORD_REDIRECT_URI ||
-              "http://involvex.myfritz.link:8081/callback",
+              "https://involvex.expo.app/callback",
           ),
         },
       ],
