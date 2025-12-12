@@ -6,6 +6,7 @@
  * You can remove the `reset-project` script from package.json and safely delete this file after running it.
  */
 
+import process from "node:process";
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -45,7 +46,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const moveDirectories = async (userInput) => {
+const moveDirectories = async userInput => {
   try {
     if (userInput === "y") {
       // Create the app-example directory
@@ -62,7 +63,10 @@ const moveDirectories = async (userInput) => {
           await fs.promises.rename(oldDirPath, newDirPath);
           console.log(`➡️ /${dir} moved to /${exampleDir}/${dir}.`);
         } else {
-          await fs.promises.rm(oldDirPath, { recursive: true, force: true });
+          await fs.promises.rm(oldDirPath, {
+            recursive: true,
+            force: true,
+          });
           console.log(`❌ /${dir} deleted.`);
         }
       } else {
@@ -91,7 +95,7 @@ const moveDirectories = async (userInput) => {
         userInput === "y"
           ? `\n3. Delete the /${exampleDir} directory when you're done referencing it.`
           : ""
-      }`
+      }`,
     );
   } catch (error) {
     console.error(`❌ Error during script execution: ${error.message}`);
@@ -100,7 +104,7 @@ const moveDirectories = async (userInput) => {
 
 rl.question(
   "Do you want to move existing files to /app-example instead of deleting them? (Y/n): ",
-  (answer) => {
+  answer => {
     const userInput = answer.trim().toLowerCase() || "y";
     if (userInput === "y" || userInput === "n") {
       moveDirectories(userInput).finally(() => rl.close());
@@ -108,5 +112,5 @@ rl.question(
       console.log("❌ Invalid input. Please enter 'Y' or 'N'.");
       rl.close();
     }
-  }
+  },
 );
