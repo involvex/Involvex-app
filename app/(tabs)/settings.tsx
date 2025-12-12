@@ -4,12 +4,18 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Image } from "expo-image";
-import { Button, Alert } from "react-native";
 import { useEffect, useState } from "react";
+import { Alert, Button } from "react-native";
 import { styles } from "../../css/styles";
+import accountService, {
+  type UserAccount,
+} from "../../services/accountService";
 import LoginScreen from "../login";
 import PermissionsScreen from "../permissions";
-import accountService, { UserAccount } from "../../services/accountService";
+import {
+  getNotificationStatus,
+  getNotificationStatusMessage,
+} from "@/services/notificationService";
 
 // Helper function to get environment variable safely
 function getEnvVar(key: string): string | undefined {
@@ -20,6 +26,8 @@ export default function SettingsScreen() {
   const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
   const [subscribedReposCount, setSubscribedReposCount] = useState(0);
   const [subscribedPackagesCount, setSubscribedPackagesCount] = useState(0);
+  const [notificationStatus, setNotificationStatus] =
+    useState<string>("Checking...");
 
   const loadUserData = async () => {
     try {
@@ -51,6 +59,19 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     loadUserData();
+
+    // Check notification status
+    const checkNotificationStatus = async () => {
+      try {
+        const status = await getNotificationStatus();
+        setNotificationStatus(getNotificationStatusMessage(status));
+      } catch (error) {
+        console.error("Error checking notification status:", error);
+        setNotificationStatus("Error checking status");
+      }
+    };
+
+    checkNotificationStatus();
   }, []);
 
   const discordClientId = getEnvVar("DISCORD_CLIENT_ID");
@@ -102,7 +123,11 @@ export default function SettingsScreen() {
             </ThemedText>
 
             <ThemedView
-              style={{ flexDirection: "row", gap: 16, marginBottom: 12 }}
+              style={{
+                flexDirection: "row",
+                gap: 16,
+                marginBottom: 12,
+              }}
             >
               <ThemedText>📚 {subscribedReposCount} Repos</ThemedText>
               <ThemedText>📦 {subscribedPackagesCount} Packages</ThemedText>
@@ -175,9 +200,48 @@ export default function SettingsScreen() {
         <PermissionsScreen />
       </ThemedView>
 
-      {/* Preferences Section */}
+      {/* Notifications Configuration Section */}
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Preferences</ThemedText>
+        <ThemedText type="subtitle">Notifications</ThemedText>
+
+        <ThemedView
+          style={{
+            padding: 16,
+            backgroundColor: "rgba(255,165,0,0.1)",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "rgba(255,165,0,0.3)",
+            marginBottom: 16,
+          }}
+        >
+          <ThemedText
+            type="defaultSemiBold"
+            style={{ marginBottom: 8, color: "#ff8c00" }}
+          >
+            ⚠️ Expo Go Limitation
+          </ThemedText>
+          <ThemedText
+            style={{
+              fontSize: 14,
+              lineHeight: 20,
+              marginBottom: 8,
+            }}
+          >
+            Push notifications functionality is not fully supported in Expo Go
+            with SDK 53. For full notification support, please use a development
+            build instead.
+          </ThemedText>
+          <ExternalLink
+            href="https://docs.expo.dev/develop/development-builds/introduction/"
+            style={{
+              color: "#007AFF",
+              fontSize: 14,
+              textDecorationLine: "underline",
+            }}
+          >
+            Learn more about development builds →
+          </ExternalLink>
+        </ThemedView>
 
         <ThemedView
           style={{
@@ -187,10 +251,14 @@ export default function SettingsScreen() {
           }}
         >
           <ThemedText style={{ marginBottom: 12 }}>
-            🔔 Notifications:{" "}
+            🔔 Notifications: {notificationStatus}
+          </ThemedText>
+
+          <ThemedText style={{ marginBottom: 12 }}>
+            📋 Preferences:{" "}
             {userAccount?.preferences?.notifications?.repoUpdates
-              ? "Enabled"
-              : "Disabled"}
+              ? "Repo Updates Enabled"
+              : "Repo Updates Disabled"}
           </ThemedText>
 
           <ThemedText style={{ marginBottom: 12 }}>
@@ -233,12 +301,20 @@ export default function SettingsScreen() {
 
         <ThemedView style={{ marginTop: 16 }}>
           <ThemedText
-            style={{ fontSize: 12, opacity: 0.7, textAlign: "center" }}
+            style={{
+              fontSize: 12,
+              opacity: 0.7,
+              textAlign: "center",
+            }}
           >
             InvolveX v1.0.0
           </ThemedText>
           <ThemedText
-            style={{ fontSize: 12, opacity: 0.7, textAlign: "center" }}
+            style={{
+              fontSize: 12,
+              opacity: 0.7,
+              textAlign: "center",
+            }}
           >
             Built with ❤️ for developers
           </ThemedText>
